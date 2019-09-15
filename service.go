@@ -52,28 +52,8 @@ func (s *Service) GetVehicle(ctx context.Context, vin string) (*Vehicle, error) 
 
 	var response getVehicleResponse
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := s.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	err = withHTTPClose(res, func() error {
-		if res.StatusCode != 200 {
-			return fmt.Errorf("could not get vehicle: received HTTP response %d", res.StatusCode)
-		}
-
-		if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-			return fmt.Errorf("could not decode get vehicle response: %w", err)
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
+	if err := s.makeRequest(ctx, requestURL, &response); err != nil {
+		return nil, fmt.Errorf("failed to get vehicle from VIN: %w", err)
 	}
 
 	return vehicleFromResponse(&response)
@@ -86,29 +66,10 @@ func (s *Service) GetMakes(ctx context.Context) ([]string, error) {
 
 	requestURL := fmt.Sprintf("%s/getallmakes?format=json", vehicleAPI)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := s.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
 	var response getMakesResponse
 
-	err = withHTTPClose(res, func() error {
-		if res.StatusCode != 200 {
-			return fmt.Errorf("could not get makes: received HTTP response %d", res.StatusCode)
-		}
-
-		if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-			return fmt.Errorf("could not decode get makes response: %w", err)
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
+	if err := s.makeRequest(ctx, requestURL, &response); err != nil {
+		return nil, fmt.Errorf("failed to get vehicle makes: %w", err)
 	}
 
 	var makes []string
@@ -118,6 +79,37 @@ func (s *Service) GetMakes(ctx context.Context) ([]string, error) {
 	}
 
 	return makes, nil
+}
+
+func (s *Service) makeRequest(ctx context.Context, url string, dest interface{}) error {
+	if s.client == nil {
+		s.client = &http.Client{}
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+	res, err := s.client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	err = withHTTPClose(res, func() error {
+		if res.StatusCode != 200 {
+			return fmt.Errorf("received bad response: received HTTP response %d", res.StatusCode)
+		}
+
+		if err := json.NewDecoder(res.Body).Decode(dest); err != nil {
+			return fmt.Errorf("could not decode response: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func vehicleFromResponse(res *getVehicleResponse) (*Vehicle, error) {
