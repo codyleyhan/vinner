@@ -58,3 +58,13 @@ func TestService_GetVehicle(t *testing.T) {
 		})
 	}
 }
+
+func TestService_GetMakes(t *testing.T) {
+	service := vinner.NewService()
+
+	makes, err := service.GetMakes(context.Background())
+	require.NoError(t, err)
+	require.NotNil(t, makes)
+
+	assert.NotEmpty(t, makes)
+}

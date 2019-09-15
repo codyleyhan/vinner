@@ -79,6 +79,47 @@ func (s *Service) GetVehicle(ctx context.Context, vin string) (*Vehicle, error) 
 	return vehicleFromResponse(&response)
 }
 
+func (s *Service) GetMakes(ctx context.Context) ([]string, error) {
+	if s.client == nil {
+		s.client = &http.Client{}
+	}
+
+	requestURL := fmt.Sprintf("%s/getallmakes?format=json", vehicleAPI)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var response getMakesResponse
+
+	err = withHTTPClose(res, func() error {
+		if res.StatusCode != 200 {
+			return fmt.Errorf("could not get makes: received HTTP response %d", res.StatusCode)
+		}
+
+		if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+			return fmt.Errorf("could not decode get makes response: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var makes []string
+
+	for _, result := range response.Results {
+		makes = append(makes, result.Make)
+	}
+
+	return makes, nil
+}
+
 func vehicleFromResponse(res *getVehicleResponse) (*Vehicle, error) {
 	fieldSet := map[apiField]bool{
 		yearField:      true,

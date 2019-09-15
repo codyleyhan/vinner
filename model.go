@@ -20,19 +20,28 @@ type Vehicle struct {
 	BodyClass VehicleType `json:"body_class"`
 }
 
-type result struct {
+type getVehicleResult struct {
 	Value    *string
 	Variable apiField
 }
 
 type getVehicleResponse struct {
 	SearchCriteria string
-	Results        []result
+	Results        []getVehicleResult
+}
+
+type getMakesResult struct {
+	Make string `json:"Make_Name"`
+}
+
+type getMakesResponse struct {
+	Results []getMakesResult
 }
 
 type apiField string
 
 const (
+	// GetVin Fields
 	// vehicle Fields
 	yearField      apiField = "Model Year"
 	makeField      apiField = "Make"
