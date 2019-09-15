@@ -5,7 +5,7 @@ const (
 	Wagon             VehicleType = "wagon"
 	Motorcycle        VehicleType = "motorcycle"
 	Truck             VehicleType = "truck"
-	UnkownVehicleType VehicleType = "unkown"
+	UnkownVehicleType VehicleType = "unknown"
 )
 
 type VehicleType string
@@ -36,6 +36,19 @@ type getMakesResult struct {
 
 type getMakesResponse struct {
 	Results []getMakesResult
+}
+
+type GetModelsRequest struct {
+	Make string
+	Year int
+}
+
+type getModelsResult struct {
+	ModelName string `json:"Model_Name"`
+}
+
+type getModelsMakeResponse struct {
+	Results []getModelsResult
 }
 
 type apiField string

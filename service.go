@@ -13,6 +13,7 @@ import (
 const vehicleAPI = "https://vpic.nhtsa.dot.gov/api/vehicles"
 
 var InvalidVIN = fmt.Errorf("invalid VIN")
+var InvalidModelsRequest = fmt.Errorf("vehicle make is required")
 
 type serviceOptionFunc func(*serviceOptions)
 
@@ -41,9 +42,6 @@ func NewService(opts ...serviceOptionFunc) *Service {
 }
 
 func (s *Service) GetVehicle(ctx context.Context, vin string) (*Vehicle, error) {
-	if s.client == nil {
-		s.client = &http.Client{}
-	}
 	if len(vin) != 17 {
 		return nil, InvalidVIN
 	}
@@ -60,10 +58,6 @@ func (s *Service) GetVehicle(ctx context.Context, vin string) (*Vehicle, error) 
 }
 
 func (s *Service) GetMakes(ctx context.Context) ([]string, error) {
-	if s.client == nil {
-		s.client = &http.Client{}
-	}
-
 	requestURL := fmt.Sprintf("%s/getallmakes?format=json", vehicleAPI)
 
 	var response getMakesResponse
@@ -79,6 +73,34 @@ func (s *Service) GetMakes(ctx context.Context) ([]string, error) {
 	}
 
 	return makes, nil
+}
+
+func (s *Service) GetModels(ctx context.Context, req GetModelsRequest) ([]string, error) {
+	if req.Make == "" {
+		return nil, InvalidModelsRequest
+	}
+
+	var requestURL string
+
+	if req.Year == 0 {
+		requestURL = fmt.Sprintf("%s/getmodelsformake/%s?format=json", vehicleAPI, req.Make)
+	} else {
+		requestURL = fmt.Sprintf("%s/getmodelsformakeyear/make/%s/modelyear/%d?format=json", vehicleAPI, req.Make, req.Year)
+	}
+
+	var response getModelsMakeResponse
+
+	if err := s.makeRequest(ctx, requestURL, &response); err != nil {
+		return nil, fmt.Errorf("failed to get vehicle models: %w", err)
+	}
+
+	var models []string
+
+	for _, result := range response.Results {
+		models = append(models, result.ModelName)
+	}
+
+	return models, nil
 }
 
 func (s *Service) makeRequest(ctx context.Context, url string, dest interface{}) error {

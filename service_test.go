@@ -68,3 +68,34 @@ func TestService_GetMakes(t *testing.T) {
 
 	assert.NotEmpty(t, makes)
 }
+
+func TestService_GetModelsForMake(t *testing.T) {
+	service := vinner.NewService()
+
+	tests := map[string]struct {
+		req vinner.GetModelsRequest
+		err error
+	}{
+		"honda no year": {
+			req: vinner.GetModelsRequest{Make: "honda"},
+		},
+		"honda 2019": {
+			req: vinner.GetModelsRequest{Make: "honda", Year: 2019},
+		},
+		"no make passed": {
+			req: vinner.GetModelsRequest{Make: "", Year: 2019},
+			err: vinner.InvalidModelsRequest,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			makes, err := service.GetModels(context.Background(), test.req)
+			require.Equal(t, test.err, err)
+			if err == nil {
+				require.NotNil(t, makes)
+				assert.NotEmpty(t, makes)
+			}
+		})
+	}
+}
