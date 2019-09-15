@@ -192,14 +192,104 @@ func vehicleFromResponse(res *getVehicleResponse) (*Vehicle, error) {
 
 	if values[bodyClassField] != nil {
 		switch *values[bodyClassField] {
-		case "Sedan/Saloon":
-			vehicle.BodyClass = Sedan
+		case "Cabriolet/Convertible":
+			vehicle.BodyClass = Convertible
+		case "Minivan":
+			vehicle.BodyClass = Minivan
+		case "Coupe":
+			vehicle.BodyClass = Coupe
+		case "Low Speed Vehicle (LSV) / Neighborhood Electric Vehicle (NEV)":
+			vehicle.BodyClass = LowSpeedVehicle
+		case "Hatchback/Liftback/Notchback":
+			vehicle.BodyClass = Hatchback
+		case "Motorcycle - Standard":
+			vehicle.BodyClass = StandardMotorcycle
+		case "Sport Utility Vehicle (SUV)/Multi Purpose Vehicle (MPV)":
+			vehicle.BodyClass = SportUtilityVehicle
+		case "Crossover Utility Vehicle (CUV)":
+			vehicle.BodyClass = CrossoverUtilityVehicle
+		case "Van":
+			vehicle.BodyClass = Van
+		case "Roadster":
+			vehicle.BodyClass = Roadster
 		case "Truck":
 			vehicle.BodyClass = Truck
-		case "Motorcycle":
-			vehicle.BodyClass = Motorcycle
+		case "Motorcycle - Scooter":
+			vehicle.BodyClass = Scooter
+		case "Sedan/Saloon":
+			vehicle.BodyClass = Sedan
 		case "Wagon":
 			vehicle.BodyClass = Wagon
+		case "Bus":
+			vehicle.BodyClass = Bus
+		case "Pickup":
+			vehicle.BodyClass = Pickup
+		case "Trailer":
+			vehicle.BodyClass = Trailer
+		case "Truck - Tractor":
+			vehicle.BodyClass = TractorTruck
+		case "Streetcar / Trolley":
+			vehicle.BodyClass = Streetcar
+		case "Off-road Vehicle - All Terrain Vehicle (ATV) (Motorcycle-style)":
+			vehicle.BodyClass = AllTerrainVehicle
+		case "Bus - School Bus":
+			vehicle.BodyClass = SchoolBus
+		case "Racing Car":
+			vehicle.BodyClass = RacingCar
+		case "Motorcycle - Sport":
+			vehicle.BodyClass = SportMotorcycle
+		case "Motorcycle - Touring / Sport Touring":
+			vehicle.BodyClass = TouringMotorcycle
+		case "Motorcycle - Cruiser":
+			vehicle.BodyClass = CruiserMotorcycle
+		case "Motorcycle - Trike":
+			vehicle.BodyClass = TrikeMotorcycle
+		case "Off-road Vehicle - Dirt Bike / Off-Road":
+			vehicle.BodyClass = DirtBike
+		case "Motorcycle - Dual Sport / Adventure / Supermoto / On/Off-road":
+			vehicle.BodyClass = DualSportMotorcycle
+		case "Off-road Vehicle - Enduro (Off-road long distance racing)":
+			vehicle.BodyClass = EnduroVehicle
+		case "Motorcycle - Small / Minibike":
+			vehicle.BodyClass = MiniBikeMotorcycle
+		case "Off-road Vehicle - Go Kart":
+			vehicle.BodyClass = GoKart
+		case "Motorcycle - Side Car":
+			vehicle.BodyClass = SideCarMotorcycle
+		case "Motorcycle - Custom":
+			vehicle.BodyClass = CustomMotorcycle
+		case "Cargo Van":
+			vehicle.BodyClass = CargoVan
+		case "Snowmobile":
+			vehicle.BodyClass = Snowmobile
+		case "Motorcycle - Street":
+			vehicle.BodyClass = StreetMotorcycle
+		case "Motorcycle - Enclosed Three Wheeled / Enclosed Autocycle":
+			vehicle.BodyClass = EnclosedThreeWheelMotorcycle
+		case "Motorcycle - Unenclosed Three Wheeled / Open Autocycle":
+			vehicle.BodyClass = UnenclosedThreeWheelMotorcycle
+		case "Motorcycle - Moped":
+			vehicle.BodyClass = Moped
+		case "Off-road Vehicle - Recreational Off-Road Vehicle (ROV)":
+			vehicle.BodyClass = RecreationalOffRoadVehicle
+		case "Motorhome":
+			vehicle.BodyClass = Motorhome
+		case "Motorcycle - Cross Country":
+			vehicle.BodyClass = CrossCountryMotorcycle
+		case "Motorcycle - Underbone":
+			vehicle.BodyClass = UnderboneMotorcycle
+		case "Step Van / Walk-in Van":
+			vehicle.BodyClass = StepVan
+		case "Off-road Vehicle - Motocross (Off-road short distance, closed track racing) ":
+			vehicle.BodyClass = MotocrossVehicle
+		case "Motorcycle - Competition":
+			vehicle.BodyClass = CompetitionMotorcycle
+		case "Limousine":
+			vehicle.BodyClass = Limousine
+		case "Sport Utility Truck (SUT)":
+			vehicle.BodyClass = SportUtilityVehicle
+		case "Golf Cart":
+			vehicle.BodyClass = GolfCart
 		default:
 			vehicle.BodyClass = UnkownVehicleType
 		}
