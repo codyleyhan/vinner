@@ -15,37 +15,37 @@ const vehicleAPI = "https://vpic.nhtsa.dot.gov/api/vehicles"
 var InvalidVIN = fmt.Errorf("invalid VIN")
 var InvalidModelsRequest = fmt.Errorf("vehicle make is required")
 
-type serviceOptionFunc func(*serviceOptions)
+type clientOptionFunc func(*cientOptions)
 
-type serviceOptions struct {
+type cientOptions struct {
 	timeout   time.Duration
 	transport http.RoundTripper
 }
 
-type Service struct {
+type Client struct {
 	client *http.Client
 }
 
-func WithTimeout(timeout time.Duration) serviceOptionFunc {
-	return func(opts *serviceOptions) {
+func WithTimeout(timeout time.Duration) clientOptionFunc {
+	return func(opts *cientOptions) {
 		opts.timeout = timeout
 	}
 }
 
-func WithTransport(transport http.RoundTripper) serviceOptionFunc {
-	return func(opts *serviceOptions) {
+func WithTransport(transport http.RoundTripper) clientOptionFunc {
+	return func(opts *cientOptions) {
 		opts.transport = transport
 	}
 }
 
-func NewService(opts ...serviceOptionFunc) *Service {
-	options := serviceOptions{}
+func NewService(opts ...clientOptionFunc) *Client {
+	options := cientOptions{}
 
 	for _, opt := range opts {
 		opt(&options)
 	}
 
-	return &Service{
+	return &Client{
 		client: &http.Client{
 			Transport: options.transport,
 			Timeout:   options.timeout,
@@ -53,7 +53,7 @@ func NewService(opts ...serviceOptionFunc) *Service {
 	}
 }
 
-func (s *Service) GetVehicle(ctx context.Context, vin string) (*Vehicle, error) {
+func (s *Client) GetVehicle(ctx context.Context, vin string) (*Vehicle, error) {
 	if len(vin) != 17 {
 		return nil, InvalidVIN
 	}
@@ -69,7 +69,7 @@ func (s *Service) GetVehicle(ctx context.Context, vin string) (*Vehicle, error) 
 	return vehicleFromResponse(&response)
 }
 
-func (s *Service) GetMakes(ctx context.Context) ([]string, error) {
+func (s *Client) GetMakes(ctx context.Context) ([]string, error) {
 	requestURL := fmt.Sprintf("%s/getallmakes?format=json", vehicleAPI)
 
 	var response getMakesResponse
@@ -87,7 +87,7 @@ func (s *Service) GetMakes(ctx context.Context) ([]string, error) {
 	return makes, nil
 }
 
-func (s *Service) GetModels(ctx context.Context, req GetModelsRequest) ([]string, error) {
+func (s *Client) GetModels(ctx context.Context, req GetModelsRequest) ([]string, error) {
 	if req.Make == "" {
 		return nil, InvalidModelsRequest
 	}
@@ -115,7 +115,7 @@ func (s *Service) GetModels(ctx context.Context, req GetModelsRequest) ([]string
 	return models, nil
 }
 
-func (s *Service) makeRequest(ctx context.Context, url string, dest interface{}) error {
+func (s *Client) makeRequest(ctx context.Context, url string, dest interface{}) error {
 	if s.client == nil {
 		s.client = &http.Client{}
 	}
